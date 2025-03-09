@@ -11,16 +11,12 @@ namespace Data_Access_Layer.Data.Contexts
 {
     public class CompanyDbContext : DbContext
     {
-        public CompanyDbContext(): base() { }
+        public CompanyDbContext(DbContextOptions options): base(options) { }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
             base.OnModelCreating(modelBuilder);
-        }
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlServer("Server=DESKTOP-IL19IGJ\\SQL2022;Database=CompanyDb;Trusted_Connection=True;TrustServerCertificate=True");
-        }
+        }      
         public DbSet<Department> Departments { get; set; }
     }
 }

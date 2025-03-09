@@ -1,3 +1,8 @@
+using Business_Logic_Layer.Interfaces;
+using Business_Logic_Layer.Repositories;
+using Data_Access_Layer.Data.Contexts;
+using Microsoft.EntityFrameworkCore;
+
 namespace Presentation_Layer
 {
     public class Program
@@ -8,6 +13,13 @@ namespace Presentation_Layer
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+            builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
+            builder.Services.AddDbContext<CompanyDbContext>(options =>
+            {
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+            }
+
+            );
 
             var app = builder.Build();
 
