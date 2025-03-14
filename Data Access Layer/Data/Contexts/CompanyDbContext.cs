@@ -18,5 +18,6 @@ namespace Data_Access_Layer.Data.Contexts
             base.OnModelCreating(modelBuilder);
         }      
         public DbSet<Department> Departments { get; set; }
+        public DbSet<Employee> Employees { get; set; }
     }
 }
