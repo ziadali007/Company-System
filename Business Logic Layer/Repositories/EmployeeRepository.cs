@@ -9,39 +9,13 @@ using System.Threading.Tasks;
 
 namespace Business_Logic_Layer.Repositories
 {
-    internal class EmployeeRepository : IEmployeeRepository
+    internal class EmployeeRepository : GenericRepository<Employee>, IEmployeeRepository
     {
-        private readonly CompanyDbContext _companyDbContext;
 
-        public EmployeeRepository(CompanyDbContext companyDbContext) {
-            _companyDbContext = companyDbContext;
-        }
-        public IEnumerable<Employee> GetAll()
+        public EmployeeRepository(CompanyDbContext companyDbContext) : base(companyDbContext)
         {
-            return _companyDbContext.Employees.ToList();
         }
-
-        public Employee? Get(int id)
-        {
-           return _companyDbContext.Employees.Find(id);
-        }
-
-        public int Add(Employee department)
-        {
-            _companyDbContext.Employees.Add(department);
-            return _companyDbContext.SaveChanges();
-        }
-
-        public int Update(Employee department)
-        {
-            _companyDbContext.Employees.Update(department);
-            return _companyDbContext.SaveChanges();
-        }
-        public int Delete(Employee department)
-        {
-            _companyDbContext.Employees.Remove(department);
-            return _companyDbContext.SaveChanges();
-        }
+        
        
     }
 }
