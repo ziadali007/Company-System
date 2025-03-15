@@ -65,13 +65,19 @@ namespace Presentation_Layer.Controllers
         [HttpGet]
         public IActionResult Edit(int? id)
         {
-            //if (id is null) return BadRequest("Invalid Id");
+            if (id is null) return BadRequest("Invalid Id");
 
-            //var department = _departmentRepository.Get(id.Value);
+            var department = _departmentRepository.Get(id.Value);
 
-            //if (department is null) return NotFound(new { StatusCode = 404, Message = $"Department With Id {id} Is Not Found" });
+            if (department is null) return NotFound(new { StatusCode = 404, Message = $"Department With Id {id} Is Not Found" });
 
-            return Details(id,"Edit");
+            var createDepartmentDto = new CreateDepartmentDto()
+            {
+                Code = department.Code,
+                Name = department.Name,
+                CreateAt = department.CreateAt
+            };
+            return View(createDepartmentDto);
         }
 
         [HttpPost]
