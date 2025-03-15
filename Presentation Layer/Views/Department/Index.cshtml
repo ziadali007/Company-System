@@ -33,15 +33,7 @@
                     <td>@department.Code</td>
                     <td>@department.Name</td>
                     <td>@department.CreateAt</td>
-                    <td>
-                        <a asp-action="Details" asp-controller="Department" asp-route-id="@department.Id" class="btn btn-warning">Details</a>
-                    </td>
-                    <td>
-                        <a asp-action="Edit" asp-controller="Department" asp-route-id="@department.Id" class="btn btn-success">Update</a>
-                    </td>
-                    <td>
-                        <a asp-action="Delete" asp-controller="Department" asp-route-id="@department.Id" class="btn btn-danger">Delete</a>
-                    </td>
+                    <partial name="ButtonPartialView" model="@department.Id"/>
                 </tr>
             })
         </tbody>
