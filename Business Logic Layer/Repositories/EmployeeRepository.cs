@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Business_Logic_Layer.Repositories
 {
-    internal class EmployeeRepository : GenericRepository<Employee>, IEmployeeRepository
+    public class EmployeeRepository : GenericRepository<Employee>, IEmployeeRepository
     {
 
         public EmployeeRepository(CompanyDbContext companyDbContext) : base(companyDbContext)
