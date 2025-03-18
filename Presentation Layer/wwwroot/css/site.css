@@ -43,7 +43,9 @@ body {
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    height: 100vh;
+    min-height: 100vh; /* Ensures at least full viewport height */
+    height: 100%; /* Covers full content height */
+    width: 100%;
     margin: 0;
     padding: 0;
 }
