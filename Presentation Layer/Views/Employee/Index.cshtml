@@ -6,6 +6,23 @@
 <h1>All Employees</h1>
 <br />
 <br />
+@* 
+<div class="mt-4">
+   <a>@ViewData["Message"]</a>
+</div>
+ *@
+
+@* 
+<div class="mt-4">
+   <a>@ViewBag.message</a>
+</div>
+ *@
+
+@if (!string.IsNullOrEmpty(TempData["Message"] as string)){
+    <div class="mt-4 alert alert-info">
+        <a>@TempData["Message"]</a>
+    </div>
+}
 
 <a asp-action="Create" asp-controller="Employee" class="btn btn-primary">Create Employee</a>
 
@@ -27,6 +44,7 @@
                 <th>IsDeleted</th>
                 <th>@Html.DisplayNameFor(E => E.HiringDate)</th>
                 <th>@Html.DisplayNameFor(E => E.CreateAt)</th>
+                <th>Department</th>
 
 
             </tr>
@@ -45,10 +63,19 @@
                     <td>@employee.IsDeleted</td>
                     <td>@employee.HiringDate</td>
                     <td>@employee.CreateAt</td>
+                    @if (employee.Department == null)
+                    {
+                        <td>No Department</td>
+
+                    }
+                    else
+                    {
+                        <td>@employee.Department.Name</td>
+                    }
                     <partial name="ButtonPartialView" model="@employee.Id" />
 
                 </tr>
-            })
+            }
         </tbody>
 
     </table>

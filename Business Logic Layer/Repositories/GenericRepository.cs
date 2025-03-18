@@ -1,6 +1,7 @@
 ﻿using Business_Logic_Layer.Interfaces;
 using Data_Access_Layer.Data.Contexts;
 using Data_Access_Layer.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,11 +19,19 @@ namespace Business_Logic_Layer.Repositories
         }
         public IEnumerable<T> GetAll()
         {
+            if(typeof(T) == typeof(Employee))
+            {
+                return (IEnumerable < T > )_context.Employees.Include(E=>E.Department).ToList() as IEnumerable<T>;
+            }
             return _context.Set<T>().ToList();
         }
 
         public T? Get(int id)
         {
+            if (typeof(T) == typeof(Employee))
+            {
+                return _context.Employees.Include(E => E.Department).FirstOrDefault(E => E.Id == id) as T;
+            }
             return _context.Set<T>().Find(id);
         }
 
