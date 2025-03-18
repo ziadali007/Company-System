@@ -10,5 +10,7 @@ namespace Data_Access_Layer.Models
     {
         public string Code { get; set; }
         public DateTime CreateAt { get; set; }
+
+        public List<Employee> Employees { get; set; }
     }
 }

@@ -9,15 +9,21 @@ namespace Presentation_Layer.Controllers
     {
         private readonly IEmployeeRepository _employeeRepository;
 
-        public EmployeeController(IEmployeeRepository employeeRepository)
+        private readonly IDepartmentRepository DepartmentRepository;
+
+        public EmployeeController(IEmployeeRepository employeeRepository, IDepartmentRepository departmentRepository)
         {
             _employeeRepository = employeeRepository;
+            DepartmentRepository = departmentRepository;
         }
 
 
         public IActionResult Index()
         {
             var employees = _employeeRepository.GetAll();
+            //ViewData["Message"]= "Welcome To Employee Page";
+
+            //ViewBag.message = "Welcome To Employee Page";
             return View(employees);
         }
 
@@ -25,6 +31,8 @@ namespace Presentation_Layer.Controllers
 
         public IActionResult Create()
         {
+            var departments = DepartmentRepository.GetAll();
+            ViewData["departments"] = departments;
             return View();
         }
 
@@ -45,11 +53,13 @@ namespace Presentation_Layer.Controllers
                     IsActive = employeeDto.IsActive,
                     IsDeleted = employeeDto.IsDeleted,
                     HiringDate = employeeDto.HiringDate,
-                    CreateAt = employeeDto.CreateAt
+                    CreateAt = employeeDto.CreateAt,
+                    DepartmentId =employeeDto.DepartmentId
                 };
                 var Count = _employeeRepository.Add(employee);
                 if (Count > 0)
                 {
+                    TempData["Message"] = "Employee Added Successfully";
                     return RedirectToAction("Index");
                 }
             }
@@ -71,6 +81,8 @@ namespace Presentation_Layer.Controllers
         [HttpGet]
         public IActionResult Edit(int? id)
         {
+            var departments = DepartmentRepository.GetAll();
+            ViewData["departments"] = departments;
             if (id is null) return BadRequest("Invalid Id");
 
             var employee = _employeeRepository.Get(id.Value);
@@ -88,7 +100,8 @@ namespace Presentation_Layer.Controllers
                 IsActive = employee.IsActive,
                 IsDeleted = employee.IsDeleted,
                 HiringDate = employee.HiringDate,
-                CreateAt = employee.CreateAt
+                CreateAt = employee.CreateAt,
+                DepartmentId = employee.DepartmentId
             };
             return View(employeeDto);
         }
