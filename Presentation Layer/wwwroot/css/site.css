@@ -17,6 +17,33 @@ html {
   min-height: 100%;
 }
 
+/* Make header background black */
+header {
+    background-color: transparent;
+}
+
+/* Make navbar text white */
+.navbar {
+    background-color: transparent !important;
+}
+
+.navbar-brand, .nav-link {
+    color: white !important;
+}
+
+    /* Hover effect */
+    .nav-link:hover {
+        color: #f8c146 !important; /* Gold color on hover */
+        transition: color 0.3s ease-in-out;
+    }
+
+
 body {
-  margin-bottom: 60px;
+    background-image: url('/images/background.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
 }
