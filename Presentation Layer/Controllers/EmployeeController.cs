@@ -1,4 +1,5 @@
-﻿using Business_Logic_Layer.Interfaces;
+﻿using AutoMapper;
+using Business_Logic_Layer.Interfaces;
 using Data_Access_Layer.Models;
 using Microsoft.AspNetCore.Mvc;
 using Presentation_Layer.Dtos;
@@ -11,10 +12,15 @@ namespace Presentation_Layer.Controllers
 
         private readonly IDepartmentRepository DepartmentRepository;
 
-        public EmployeeController(IEmployeeRepository employeeRepository, IDepartmentRepository departmentRepository)
+        private readonly IMapper _mapper;
+
+        public EmployeeController(IEmployeeRepository employeeRepository,
+            IDepartmentRepository departmentRepository,
+            IMapper mapper)
         {
             _employeeRepository = employeeRepository;
             DepartmentRepository = departmentRepository;
+            _mapper = mapper;
         }
 
 
@@ -52,20 +58,22 @@ namespace Presentation_Layer.Controllers
         {
             if (ModelState.IsValid)
             {
-                var employee = new Employee()
-                {
-                    Name = employeeDto.Name,
-                    Age = employeeDto.Age,
-                    Address = employeeDto.Address,
-                    Email = employeeDto.Email,
-                    Phone = employeeDto.Phone,
-                    Salary = employeeDto.Salary,
-                    IsActive = employeeDto.IsActive,
-                    IsDeleted = employeeDto.IsDeleted,
-                    HiringDate = employeeDto.HiringDate,
-                    CreateAt = employeeDto.CreateAt,
-                    DepartmentId =employeeDto.DepartmentId
-                };
+                //var employee = new Employee()
+                //{
+                //    Name = employeeDto.Name,
+                //    Age = employeeDto.Age,
+                //    Address = employeeDto.Address,
+                //    Email = employeeDto.Email,
+                //    Phone = employeeDto.Phone,
+                //    Salary = employeeDto.Salary,
+                //    IsActive = employeeDto.IsActive,
+                //    IsDeleted = employeeDto.IsDeleted,
+                //    HiringDate = employeeDto.HiringDate,
+                //    CreateAt = employeeDto.CreateAt,
+                //    DepartmentId =employeeDto.DepartmentId
+                //};
+
+                var employee = _mapper.Map<Employee>(employeeDto);
                 var Count = _employeeRepository.Add(employee);
                 if (Count > 0)
                 {
@@ -99,20 +107,21 @@ namespace Presentation_Layer.Controllers
 
             if (employee is null) return NotFound(new { StatusCode = 404, Message = $"Department With Id {id} Is Not Found" });
 
-            var employeeDto = new CreateEmployeeDto()
-            {
-                Name = employee.Name,
-                Age = employee.Age,
-                Address = employee.Address,
-                Email = employee.Email,
-                Phone = employee.Phone,
-                Salary = employee.Salary,
-                IsActive = employee.IsActive,
-                IsDeleted = employee.IsDeleted,
-                HiringDate = employee.HiringDate,
-                CreateAt = employee.CreateAt,
-                DepartmentId = employee.DepartmentId
-            };
+            //var employeeDto = new CreateEmployeeDto()
+            //{
+            //    Name = employee.Name,
+            //    Age = employee.Age,
+            //    Address = employee.Address,
+            //    Email = employee.Email,
+            //    Phone = employee.Phone,
+            //    Salary = employee.Salary,
+            //    IsActive = employee.IsActive,
+            //    IsDeleted = employee.IsDeleted,
+            //    HiringDate = employee.HiringDate,
+            //    CreateAt = employee.CreateAt,
+            //    DepartmentId = employee.DepartmentId
+            //};
+            var employeeDto = _mapper.Map<CreateEmployeeDto>(employee);
             return View(employeeDto);
         }
 

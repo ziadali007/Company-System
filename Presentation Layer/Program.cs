@@ -2,6 +2,7 @@ using Business_Logic_Layer.Interfaces;
 using Business_Logic_Layer.Repositories;
 using Data_Access_Layer.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
+using Presentation_Layer.Mapping;
 using Presentation_Layer.Services;
 
 namespace Presentation_Layer
@@ -21,8 +22,9 @@ namespace Presentation_Layer
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             }
-
             );
+
+            builder.Services.AddAutoMapper(typeof(EmployeeProfile));
 
             builder.Services.AddScoped<IScopedService, ScopedService>();
             builder.Services.AddTransient<ITransientService, TransientService>();
