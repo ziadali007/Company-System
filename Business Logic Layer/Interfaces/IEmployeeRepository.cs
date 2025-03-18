@@ -9,16 +9,18 @@ namespace Business_Logic_Layer.Interfaces
 {
     public interface IEmployeeRepository : IGenericRepository<Employee>
     {
-        IEnumerable<Employee> GetAll();
+        //IEnumerable<Employee> GetAll();
 
-        Employee? Get(int id);
+        //Employee? Get(int id);
 
-        int Add(Employee department);
-
-
-        int Update(Employee department);
+        //int Add(Employee department);
 
 
-        int Delete(Employee department);
+        //int Update(Employee department);
+
+
+        //int Delete(Employee department);
+
+        IEnumerable<Employee> GetByName(string name);
     }
 }

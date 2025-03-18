@@ -18,13 +18,23 @@ namespace Presentation_Layer.Controllers
         }
 
 
-        public IActionResult Index()
+        public IActionResult Index(string? Search)
         {
-            var employees = _employeeRepository.GetAll();
+            IEnumerable<Employee> employees;
+            if (Search is not null)
+            {
+                employees = _employeeRepository.GetByName(Search);
+                return View(employees);
+            }
+            else
+            {
+                employees = _employeeRepository.GetAll();
+                return View(employees);
+            }
+           
             //ViewData["Message"]= "Welcome To Employee Page";
 
             //ViewBag.message = "Welcome To Employee Page";
-            return View(employees);
         }
 
         [HttpGet]
