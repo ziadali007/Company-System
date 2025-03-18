@@ -2,6 +2,7 @@ using Business_Logic_Layer.Interfaces;
 using Business_Logic_Layer.Repositories;
 using Data_Access_Layer.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
+using Presentation_Layer.Services;
 
 namespace Presentation_Layer
 {
@@ -22,6 +23,10 @@ namespace Presentation_Layer
             }
 
             );
+
+            builder.Services.AddScoped<IScopedService, ScopedService>();
+            builder.Services.AddTransient<ITransientService, TransientService>();
+            builder.Services.AddSingleton<ISingletonService, SingletonService>();
 
             var app = builder.Build();
 
