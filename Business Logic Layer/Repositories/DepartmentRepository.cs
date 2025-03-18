@@ -1,6 +1,7 @@
 ﻿using Business_Logic_Layer.Interfaces;
 using Data_Access_Layer.Data.Contexts;
 using Data_Access_Layer.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,9 +12,16 @@ namespace Business_Logic_Layer.Repositories
 {
     public class DepartmentRepository : GenericRepository<Department>, IDepartmentRepository
     {       
+        private readonly CompanyDbContext _context;
         public DepartmentRepository(CompanyDbContext companyDbContext) : base(companyDbContext)
         {
+            _context = companyDbContext;
         }
-       
+
+        public IEnumerable<Department> GetByName(string name)
+        {
+            return _context.Departments.Include(D => D.Employees).Where(D => D.Name.ToLower().Contains(name.ToLower())).ToList();
+
+        }
     }
 }

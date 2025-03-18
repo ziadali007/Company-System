@@ -16,10 +16,21 @@ namespace Presentation_Layer.Controllers
         }
 
 
-        public IActionResult Index()
+        public IActionResult Index(string? Search)
         {
-            var departments = _departmentRepository.GetAll();
-            return View(departments);
+            IEnumerable<Department> departments;
+            if (Search is not null)
+            {
+                departments = _departmentRepository.GetByName(Search);
+                return View(departments);
+            }
+            else
+            {
+                departments = _departmentRepository.GetAll();
+                return View(departments);
+            }
+            //var departments = _departmentRepository.GetAll();
+            //return View(departments);
         }
 
         [HttpGet]
