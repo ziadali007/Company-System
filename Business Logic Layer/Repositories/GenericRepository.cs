@@ -35,21 +35,18 @@ namespace Business_Logic_Layer.Repositories
             return _context.Set<T>().Find(id);
         }
 
-        public int Add(T department)
+        public void Add(T model)
         {
-            _context.Set<T>().Add(department);
-            return _context.SaveChanges();
+            _context.Set<T>().Add(model);
         }
 
-        public int Update(T department)
+        public void Update(T model)
         {
-            _context.Set<T>().Update(department);
-            return _context.SaveChanges();
+            _context.Set<T>().Update(model);
         }
-        public int Delete(T department)
+        public void Delete(T model)
         {
-            _context.Set<T>().Remove(department);
-            return _context.SaveChanges();
+            _context.Set<T>().Remove(model);
         }
     }
 }

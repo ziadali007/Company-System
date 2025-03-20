@@ -1,4 +1,5 @@
-﻿using Business_Logic_Layer.Interfaces;
+﻿using AutoMapper;
+using Business_Logic_Layer.Interfaces;
 using Business_Logic_Layer.Repositories;
 using Data_Access_Layer.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -8,11 +9,13 @@ namespace Presentation_Layer.Controllers
 {
     public class DepartmentController : Controller
     {
-        private readonly IDepartmentRepository _departmentRepository;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public DepartmentController(IDepartmentRepository departmentRepository)
+        public DepartmentController(IUnitOfWork unitRepository , IMapper mapper)
         {
-            _departmentRepository = departmentRepository;
+            _unitOfWork = unitRepository;
+            _mapper = mapper;
         }
 
 
@@ -21,12 +24,12 @@ namespace Presentation_Layer.Controllers
             IEnumerable<Department> departments;
             if (Search is not null)
             {
-                departments = _departmentRepository.GetByName(Search);
+                departments = _unitOfWork.departmentRepository.GetByName(Search);
                 return View(departments);
             }
             else
             {
-                departments = _departmentRepository.GetAll();
+                departments = _unitOfWork.departmentRepository.GetAll();
                 return View(departments);
             }
             //var departments = _departmentRepository.GetAll();
@@ -46,13 +49,15 @@ namespace Presentation_Layer.Controllers
         {
             if(ModelState.IsValid)
             {
-                var department = new Department()
-                {
-                    Code = departmentDto.Code,
-                    Name = departmentDto.Name,
-                    CreateAt = departmentDto.CreateAt
-                };
-                var Count = _departmentRepository.Add(department);
+                //var department = new Department()
+                //{
+                //    Code = departmentDto.Code,
+                //    Name = departmentDto.Name,
+                //    CreateAt = departmentDto.CreateAt
+                //};
+                var department = _mapper.Map<Department>(departmentDto);
+                _unitOfWork.departmentRepository.Add(department);
+                var Count = _unitOfWork.Complete();
                 if (Count > 0)
                 {
                     return RedirectToAction("Index");
@@ -65,7 +70,7 @@ namespace Presentation_Layer.Controllers
         {
             if (id is null) return BadRequest("Invalid Id");
 
-            var department = _departmentRepository.Get(id.Value);
+            var department = _unitOfWork.departmentRepository.Get(id.Value);
 
             if (department is null) return NotFound(new { StatusCode = 404, Message = $"Department With Id {id} Is Not Found" });
 
@@ -78,16 +83,17 @@ namespace Presentation_Layer.Controllers
         {
             if (id is null) return BadRequest("Invalid Id");
 
-            var department = _departmentRepository.Get(id.Value);
+            var department = _unitOfWork.departmentRepository.Get(id.Value);
 
             if (department is null) return NotFound(new { StatusCode = 404, Message = $"Department With Id {id} Is Not Found" });
 
-            var createDepartmentDto = new CreateDepartmentDto()
-            {
-                Code = department.Code,
-                Name = department.Name,
-                CreateAt = department.CreateAt
-            };
+            //var createDepartmentDto = new CreateDepartmentDto()
+            //{
+            //    Code = department.Code,
+            //    Name = department.Name,
+            //    CreateAt = department.CreateAt
+            //};
+            var createDepartmentDto = _mapper.Map<CreateDepartmentDto>(department);
             return View(createDepartmentDto);
         }
 
@@ -97,7 +103,8 @@ namespace Presentation_Layer.Controllers
         {
             if (ModelState.IsValid)
             {
-                var Count = _departmentRepository.Update(department);
+                _unitOfWork.departmentRepository.Update(department);
+                var Count = _unitOfWork.Complete();
                 if (Count > 0)
                 {
                     return RedirectToAction("Index");
@@ -146,7 +153,8 @@ namespace Presentation_Layer.Controllers
         {
             if (ModelState.IsValid)
             {
-                var Count = _departmentRepository.Delete(department);
+                _unitOfWork.departmentRepository.Delete(department);
+                var Count = _unitOfWork.Complete();
                 if (Count > 0)
                 {
                     return RedirectToAction("Index");
