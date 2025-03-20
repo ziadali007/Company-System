@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Business_Logic_Layer.Interfaces;
+using Business_Logic_Layer.Repositories;
 using Data_Access_Layer.Models;
 using Microsoft.AspNetCore.Mvc;
 using Presentation_Layer.Dtos;
@@ -8,19 +9,14 @@ namespace Presentation_Layer.Controllers
 {
     public class EmployeeController : Controller
     {
-        private readonly IEmployeeRepository _employeeRepository;
-
-        private readonly IDepartmentRepository DepartmentRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
         private readonly IMapper _mapper;
 
-        public EmployeeController(IEmployeeRepository employeeRepository,
-            IDepartmentRepository departmentRepository,
-            IMapper mapper)
+        public EmployeeController(IUnitOfWork unitOfWork, IMapper mapper)
         {
-            _employeeRepository = employeeRepository;
-            DepartmentRepository = departmentRepository;
-            _mapper = mapper;
+            _unitOfWork = unitOfWork;
+             _mapper = mapper;
         }
 
 
@@ -29,12 +25,12 @@ namespace Presentation_Layer.Controllers
             IEnumerable<Employee> employees;
             if (Search is not null)
             {
-                employees = _employeeRepository.GetByName(Search);
+                employees = _unitOfWork.employeeRepository.GetByName(Search);
                 return View(employees);
             }
             else
             {
-                employees = _employeeRepository.GetAll();
+                employees = _unitOfWork.employeeRepository.GetAll();
                 return View(employees);
             }
            
@@ -47,7 +43,7 @@ namespace Presentation_Layer.Controllers
 
         public IActionResult Create()
         {
-            var departments = DepartmentRepository.GetAll();
+            var departments = _unitOfWork.departmentRepository.GetAll();
             ViewData["departments"] = departments;
             return View();
         }
@@ -74,7 +70,8 @@ namespace Presentation_Layer.Controllers
                 //};
 
                 var employee = _mapper.Map<Employee>(employeeDto);
-                var Count = _employeeRepository.Add(employee);
+                _unitOfWork.employeeRepository.Add(employee);
+                var Count = _unitOfWork.Complete();
                 if (Count > 0)
                 {
                     TempData["Message"] = "Employee Added Successfully";
@@ -88,7 +85,7 @@ namespace Presentation_Layer.Controllers
         {
             if (id is null) return BadRequest("Invalid Id");
 
-            var employee = _employeeRepository.Get(id.Value);
+            var employee = _unitOfWork.employeeRepository.Get(id.Value);
 
             if (employee is null) return NotFound(new { StatusCode = 404, Message = $"Employee With Id {id} Is Not Found" });
 
@@ -99,11 +96,11 @@ namespace Presentation_Layer.Controllers
         [HttpGet]
         public IActionResult Edit(int? id)
         {
-            var departments = DepartmentRepository.GetAll();
+            var departments = _unitOfWork.departmentRepository.GetAll();
             ViewData["departments"] = departments;
             if (id is null) return BadRequest("Invalid Id");
 
-            var employee = _employeeRepository.Get(id.Value);
+            var employee = _unitOfWork.employeeRepository.Get(id.Value);
 
             if (employee is null) return NotFound(new { StatusCode = 404, Message = $"Department With Id {id} Is Not Found" });
 
@@ -131,7 +128,8 @@ namespace Presentation_Layer.Controllers
         {
             if (ModelState.IsValid)
             {
-                var Count = _employeeRepository.Update(employee);
+                _unitOfWork.employeeRepository.Update(employee);
+                var Count = _unitOfWork.Complete();
                 if (Count > 0)
                 {
                     return RedirectToAction("Index");
@@ -176,17 +174,20 @@ namespace Presentation_Layer.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Delete([FromRoute] int id, Employee employee)
+        public IActionResult Delete([FromRoute] int id, CreateEmployeeDto employeeDto)
         {
             if (ModelState.IsValid)
             {
-                var Count = _employeeRepository.Delete(employee);
+                var employee = _mapper.Map<Employee>(employeeDto);
+                employee.Id = id;
+                _unitOfWork.employeeRepository.Delete(employee);
+                var Count = _unitOfWork.Complete();
                 if (Count > 0)
                 {
                     return RedirectToAction("Index");
                 }
             }
-            return View(employee);
+            return View(employeeDto);
         }
     }
 }

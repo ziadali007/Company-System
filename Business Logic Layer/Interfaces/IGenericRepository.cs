@@ -13,12 +13,12 @@ namespace Business_Logic_Layer.Interfaces
 
         T? Get(int id);
 
-        int Add(T department);
+        void Add(T department);
 
 
-        int Update(T department);
+        void Update(T department);
 
 
-        int Delete(T department);
+        void Delete(T department);
     }
 }
