@@ -16,12 +16,11 @@ namespace Business_Logic_Layer.Repositories
         public DepartmentRepository(CompanyDbContext companyDbContext) : base(companyDbContext)
         {
             _context = companyDbContext;
-        }
+        }   
 
-        public IEnumerable<Department> GetByName(string name)
+        public async Task<IEnumerable<Department>> GetByNameAsync(string name)
         {
-            return _context.Departments.Include(D => D.Employees).Where(D => D.Name.ToLower().Contains(name.ToLower())).ToList();
-
+            return await _context.Departments.Include(D => D.Employees).Where(D => D.Name.ToLower().Contains(name.ToLower())).ToListAsync();
         }
     }
 }

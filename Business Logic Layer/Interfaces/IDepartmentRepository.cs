@@ -21,6 +21,6 @@ namespace Business_Logic_Layer.Interfaces
 
         //int Delete(Department department);
 
-        IEnumerable<Department> GetByName(string name);
+        Task<IEnumerable<Department>> GetByNameAsync(string name);
     }
 }
