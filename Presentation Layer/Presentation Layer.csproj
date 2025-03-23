@@ -25,7 +25,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\images\" />
+    <Folder Include="wwwroot\BackgroundImages\" />
+    <Folder Include="wwwroot\Files\images\" />
+    <Folder Include="wwwroot\Files\Videos\" />
   </ItemGroup>
 
 </Project>
