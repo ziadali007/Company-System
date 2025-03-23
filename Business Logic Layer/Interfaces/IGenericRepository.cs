@@ -9,16 +9,18 @@ namespace Business_Logic_Layer.Interfaces
 {
     public interface IGenericRepository<T> where T : BaseEntity
     {
-        IEnumerable<T> GetAll();
+        Task<IEnumerable<T>> GetAllAsync();
 
-        T? Get(int id);
+        Task<T?> GetAsync(int id);
 
-        void Add(T department);
+        Task AddAsync(T department);
 
 
         void Update(T department);
 
 
         void Delete(T department);
+
+
     }
 }

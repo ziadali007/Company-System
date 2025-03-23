@@ -3,6 +3,7 @@ using Business_Logic_Layer.Interfaces;
 using Business_Logic_Layer.Repositories;
 using Data_Access_Layer.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Presentation_Layer.Dtos;
 using Presentation_Layer.Helpers;
 
@@ -21,17 +22,17 @@ namespace Presentation_Layer.Controllers
         }
 
 
-        public IActionResult Index(string? Search)
+        public async Task<IActionResult> Index(string? Search)
         {
             IEnumerable<Employee> employees;
             if (Search is not null)
             {
-                employees = _unitOfWork.employeeRepository.GetByName(Search);
+                employees = await _unitOfWork.employeeRepository.GetByNameAsync(Search);
                 return View(employees);
             }
             else
             {
-                employees = _unitOfWork.employeeRepository.GetAll();
+                employees = await _unitOfWork.employeeRepository.GetAllAsync();
                 return View(employees);
             }
            
@@ -42,16 +43,16 @@ namespace Presentation_Layer.Controllers
 
         [HttpGet]
 
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            var departments = _unitOfWork.departmentRepository.GetAll();
+            var departments = await _unitOfWork.departmentRepository.GetAllAsync();
             ViewData["departments"] = departments;
             return View();
         }
 
 
         [HttpPost]
-        public IActionResult Create(CreateEmployeeDto employeeDto)
+        public async Task<IActionResult> Create(CreateEmployeeDto employeeDto)
         {
             if (ModelState.IsValid)
             {
@@ -61,8 +62,8 @@ namespace Presentation_Layer.Controllers
                 }
                 
                 var employee = _mapper.Map<Employee>(employeeDto);
-                _unitOfWork.employeeRepository.Add(employee);
-                var Count = _unitOfWork.Complete();
+                await _unitOfWork.employeeRepository.AddAsync(employee);
+                var Count =await _unitOfWork.CompleteAsync();
                 if (Count > 0)
                 {
                     TempData["Message"] = "Employee Added Successfully";
@@ -72,11 +73,11 @@ namespace Presentation_Layer.Controllers
             return View(employeeDto);
         }
         [HttpGet]
-        public IActionResult Details(int? id, string ViewName = "Details")
+        public async Task<IActionResult> Details(int? id, string ViewName = "Details")
         {
             if (id is null) return BadRequest("Invalid Id");
 
-            var employee = _unitOfWork.employeeRepository.Get(id.Value);
+            var employee = await _unitOfWork.employeeRepository.GetAsync(id.Value);
 
             if (employee is null) return NotFound(new { StatusCode = 404, Message = $"Employee With Id {id} Is Not Found" });
 
@@ -85,13 +86,13 @@ namespace Presentation_Layer.Controllers
         }
 
         [HttpGet]
-        public IActionResult Edit(int? id)
+        public async Task<IActionResult> Edit(int? id)
         {
-            var departments = _unitOfWork.departmentRepository.GetAll();
+            var departments =await _unitOfWork.departmentRepository.GetAllAsync();
             ViewData["departments"] = departments;
             if (id is null) return BadRequest("Invalid Id");
 
-            var employee = _unitOfWork.employeeRepository.Get(id.Value);
+            var employee =await _unitOfWork.employeeRepository.GetAsync(id.Value);
 
             if (employee is null) return NotFound(new { StatusCode = 404, Message = $"Department With Id {id} Is Not Found" });
 
@@ -115,12 +116,12 @@ namespace Presentation_Layer.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit([FromRoute] int id, CreateEmployeeDto employeeDto)
+        public async Task<IActionResult> Edit([FromRoute] int id, CreateEmployeeDto employeeDto)
         {
-           
+            var employee=await _unitOfWork.employeeRepository.GetAsync(id);
             if (ModelState.IsValid)
             {
-                if(employeeDto.ImageName is not null && employeeDto.Image is not null)
+                if (employeeDto.ImageName is not null && employeeDto.Image is not null)
                 {
                     DocumentSetting.DeleteFile("images", employeeDto.ImageName);
                 }
@@ -128,10 +129,14 @@ namespace Presentation_Layer.Controllers
                 {
                     employeeDto.ImageName = DocumentSetting.UploadFile(employeeDto.Image, "images");
                 }
-                var employee = _mapper.Map<Employee>(employeeDto);
+                else
+                {
+                    employeeDto.ImageName = employee.ImageName; // Preserve existing image name
+                }
+                _mapper.Map(employeeDto, employee);
                 employee.Id = id;
                 _unitOfWork.employeeRepository.Update(employee);
-                var Count = _unitOfWork.Complete();
+                var Count =await _unitOfWork.CompleteAsync();
                 if (Count > 0)
                 {
                     return RedirectToAction("Index");
@@ -163,7 +168,7 @@ namespace Presentation_Layer.Controllers
         //}
 
         [HttpGet]
-        public IActionResult Delete(int? id)
+        public async Task<IActionResult> Delete(int? id)
         {
             //if (id is null) return BadRequest("Invalid Id");
 
@@ -171,12 +176,12 @@ namespace Presentation_Layer.Controllers
 
             //if (department is null) return NotFound(new { StatusCode = 404, Message = $"Department With Id {id} Is Not Found" });
 
-            return Details(id, "Delete");
+            return await Details(id, "Delete");
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Delete([FromRoute] int id, CreateEmployeeDto employeeDto)
+        public async Task<IActionResult> Delete([FromRoute] int id, CreateEmployeeDto employeeDto)
         {
             if (ModelState.IsValid)
             {
@@ -184,7 +189,7 @@ namespace Presentation_Layer.Controllers
                 var employee = _mapper.Map<Employee>(employeeDto);
                 employee.Id = id;
                 _unitOfWork.employeeRepository.Delete(employee);
-                var Count = _unitOfWork.Complete();
+                var Count =await _unitOfWork.CompleteAsync();
                 if (Count > 0)
                 {
                     if (employeeDto.ImageName is not null)

@@ -20,12 +20,15 @@ html {
 /* Make header background black */
 header {
     background-color: transparent;
+    margin: 0;
+    padding: 0;
 }
 
 /* Make navbar text white */
 /* Make navbar transparent */
 .navbar {
     background-color: transparent !important;
+    margin-bottom: 0 !important;
 }
 
 /* Set navbar text color to black */
@@ -47,6 +50,10 @@ th {
 /* Apply white text color only to table data cells */
 td {
     color: #f5f5dc !important;
+}
+
+h1 {
+    color: white;
 }
 
 input[name="Search"] {

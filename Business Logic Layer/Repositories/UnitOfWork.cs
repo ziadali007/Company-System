@@ -1,5 +1,6 @@
 ﻿using Business_Logic_Layer.Interfaces;
 using Data_Access_Layer.Data.Contexts;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,14 +24,14 @@ namespace Business_Logic_Layer.Repositories
             employeeRepository=new EmployeeRepository(_context);
         }
 
-        public int Complete()
+        public async Task<int> CompleteAsync()
         {
-            return _context.SaveChanges();
+           return await _context.SaveChangesAsync();
         }
 
-        void IDisposable.Dispose()
+        public async ValueTask DisposeAsync()
         {
-            _context.Dispose();
+            await _context.DisposeAsync();
         }
       
     }
