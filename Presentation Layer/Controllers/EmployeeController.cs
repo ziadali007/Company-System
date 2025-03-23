@@ -4,6 +4,7 @@ using Business_Logic_Layer.Repositories;
 using Data_Access_Layer.Models;
 using Microsoft.AspNetCore.Mvc;
 using Presentation_Layer.Dtos;
+using Presentation_Layer.Helpers;
 
 namespace Presentation_Layer.Controllers
 {
@@ -54,21 +55,11 @@ namespace Presentation_Layer.Controllers
         {
             if (ModelState.IsValid)
             {
-                //var employee = new Employee()
-                //{
-                //    Name = employeeDto.Name,
-                //    Age = employeeDto.Age,
-                //    Address = employeeDto.Address,
-                //    Email = employeeDto.Email,
-                //    Phone = employeeDto.Phone,
-                //    Salary = employeeDto.Salary,
-                //    IsActive = employeeDto.IsActive,
-                //    IsDeleted = employeeDto.IsDeleted,
-                //    HiringDate = employeeDto.HiringDate,
-                //    CreateAt = employeeDto.CreateAt,
-                //    DepartmentId =employeeDto.DepartmentId
-                //};
-
+                if(employeeDto.Image is not null)
+                {
+                    employeeDto.ImageName = DocumentSetting.UploadFile(employeeDto.Image, "images");
+                }
+                
                 var employee = _mapper.Map<Employee>(employeeDto);
                 _unitOfWork.employeeRepository.Add(employee);
                 var Count = _unitOfWork.Complete();
@@ -124,10 +115,21 @@ namespace Presentation_Layer.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit([FromRoute] int id, Employee employee)
+        public IActionResult Edit([FromRoute] int id, CreateEmployeeDto employeeDto)
         {
+           
             if (ModelState.IsValid)
             {
+                if(employeeDto.ImageName is not null && employeeDto.Image is not null)
+                {
+                    DocumentSetting.DeleteFile("images", employeeDto.ImageName);
+                }
+                if (employeeDto.Image is not null)
+                {
+                    employeeDto.ImageName = DocumentSetting.UploadFile(employeeDto.Image, "images");
+                }
+                var employee = _mapper.Map<Employee>(employeeDto);
+                employee.Id = id;
                 _unitOfWork.employeeRepository.Update(employee);
                 var Count = _unitOfWork.Complete();
                 if (Count > 0)
@@ -135,7 +137,7 @@ namespace Presentation_Layer.Controllers
                     return RedirectToAction("Index");
                 }
             }
-            return View(employee);
+            return View(employeeDto);
         }
 
         //[HttpPost]
@@ -178,12 +180,17 @@ namespace Presentation_Layer.Controllers
         {
             if (ModelState.IsValid)
             {
+                
                 var employee = _mapper.Map<Employee>(employeeDto);
                 employee.Id = id;
                 _unitOfWork.employeeRepository.Delete(employee);
                 var Count = _unitOfWork.Complete();
                 if (Count > 0)
                 {
+                    if (employeeDto.ImageName is not null)
+                    {
+                        DocumentSetting.DeleteFile("images", employeeDto.ImageName);
+                    }
                     return RedirectToAction("Index");
                 }
             }
