@@ -2,6 +2,7 @@
 using Business_Logic_Layer.Interfaces;
 using Business_Logic_Layer.Repositories;
 using Data_Access_Layer.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Presentation_Layer.Dtos;
@@ -9,6 +10,8 @@ using Presentation_Layer.Helpers;
 
 namespace Presentation_Layer.Controllers
 {
+    [Authorize]
+
     public class EmployeeController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
