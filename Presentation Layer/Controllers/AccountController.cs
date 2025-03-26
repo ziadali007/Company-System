@@ -64,5 +64,24 @@ namespace Presentation_Layer.Controllers
         {
             return View();
         }
+
+        [HttpPost]
+        public async Task<IActionResult> SignIn(SignInDto model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                if (user is not null)
+                {
+                    var result = await _userManager.CheckPasswordAsync(user, model.Password);
+                    if (result)
+                    {
+                        return RedirectToAction("Index", "Home");
+                    }
+                }
+                ModelState.AddModelError("", "Invalid SignIn !!");
+            }
+            return View(model);
+        }
     }
 }
