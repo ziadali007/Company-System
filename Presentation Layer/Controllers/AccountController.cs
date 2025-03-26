@@ -90,5 +90,12 @@ namespace Presentation_Layer.Controllers
             }
             return View(model);
         }
+
+        [HttpGet]
+        public new async Task<IActionResult> SignOutAsync()
+        {
+            await _signInManager.SignOutAsync();
+            return RedirectToAction("SignIn");
+        }
     }
 }
