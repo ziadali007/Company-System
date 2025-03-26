@@ -8,9 +8,12 @@ namespace Presentation_Layer.Controllers
     public class AccountController : Controller
     {
         private readonly UserManager<AppUser> _userManager;
-        public AccountController(UserManager<AppUser> userManager)
+
+        private readonly SignInManager<AppUser> _signInManager;
+        public AccountController(UserManager<AppUser> userManager,SignInManager<AppUser> signInManager)
         {
             _userManager = userManager;
+            _signInManager = signInManager;
         }
         [HttpGet]
         public IActionResult SignUp()
@@ -76,7 +79,11 @@ namespace Presentation_Layer.Controllers
                     var result = await _userManager.CheckPasswordAsync(user, model.Password);
                     if (result)
                     {
-                        return RedirectToAction("Index", "Home");
+                        var resultSignIn = await _signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, false);
+                        if (resultSignIn.Succeeded)
+                        {
+                            return RedirectToAction("Index", "Home");
+                        }
                     }
                 }
                 ModelState.AddModelError("", "Invalid SignIn !!");

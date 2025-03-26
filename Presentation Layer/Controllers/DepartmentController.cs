@@ -2,11 +2,13 @@
 using Business_Logic_Layer.Interfaces;
 using Business_Logic_Layer.Repositories;
 using Data_Access_Layer.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Presentation_Layer.Dtos;
 
 namespace Presentation_Layer.Controllers
 {
+    [Authorize]
     public class DepartmentController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;

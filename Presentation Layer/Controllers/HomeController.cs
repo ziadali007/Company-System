@@ -1,11 +1,13 @@
 using System.Diagnostics;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Presentation_Layer.Models;
 using Presentation_Layer.Services;
 
 namespace Presentation_Layer.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;

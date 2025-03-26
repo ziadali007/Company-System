@@ -36,6 +36,11 @@ namespace Presentation_Layer
             builder.Services.AddIdentity<AppUser, IdentityRole>()
                 .AddEntityFrameworkStores<CompanyDbContext>();
 
+            builder.Services.ConfigureApplicationCookie(options =>
+            {
+                options.LoginPath = "/Account/SignIn";
+            });
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -47,9 +52,12 @@ namespace Presentation_Layer
             }
 
             app.UseHttpsRedirection();
-            app.UseStaticFiles();
+            app.UseStaticFiles();         
 
             app.UseRouting();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.MapControllerRoute(
                 name: "default",
