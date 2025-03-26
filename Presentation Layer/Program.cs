@@ -1,6 +1,8 @@
 using Business_Logic_Layer.Interfaces;
 using Business_Logic_Layer.Repositories;
 using Data_Access_Layer.Data.Contexts;
+using Data_Access_Layer.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Presentation_Layer.Mapping;
 using Presentation_Layer.Services;
@@ -30,6 +32,9 @@ namespace Presentation_Layer
             builder.Services.AddScoped<IScopedService, ScopedService>();
             builder.Services.AddTransient<ITransientService, TransientService>();
             builder.Services.AddSingleton<ISingletonService, SingletonService>();
+
+            builder.Services.AddIdentity<AppUser, IdentityRole>()
+                .AddEntityFrameworkStores<CompanyDbContext>();
 
             var app = builder.Build();
 
