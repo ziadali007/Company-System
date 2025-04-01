@@ -34,7 +34,8 @@ namespace Presentation_Layer
             builder.Services.AddSingleton<ISingletonService, SingletonService>();
 
             builder.Services.AddIdentity<AppUser, IdentityRole>()
-                .AddEntityFrameworkStores<CompanyDbContext>();
+                .AddEntityFrameworkStores<CompanyDbContext>()
+                .AddDefaultTokenProviders();    
 
             builder.Services.ConfigureApplicationCookie(options =>
             {

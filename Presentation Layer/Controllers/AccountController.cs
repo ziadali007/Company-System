@@ -1,7 +1,10 @@
 ﻿using Data_Access_Layer.Models;
+using Humanizer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using Presentation_Layer.Dtos;
+using Presentation_Layer.Helpers;
 
 namespace Presentation_Layer.Controllers
 {
@@ -10,7 +13,7 @@ namespace Presentation_Layer.Controllers
         private readonly UserManager<AppUser> _userManager;
 
         private readonly SignInManager<AppUser> _signInManager;
-        public AccountController(UserManager<AppUser> userManager,SignInManager<AppUser> signInManager)
+        public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -26,11 +29,11 @@ namespace Presentation_Layer.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user=await _userManager.FindByNameAsync(model.UserName);
+                var user = await _userManager.FindByNameAsync(model.UserName);
                 if (user is null)
                 {
-                    user=await _userManager.FindByEmailAsync(model.Email);
-                    if(user is null)
+                    user = await _userManager.FindByEmailAsync(model.Email);
+                    if (user is null)
                     {
                         user = new AppUser
                         {
@@ -96,6 +99,81 @@ namespace Presentation_Layer.Controllers
         {
             await _signInManager.SignOutAsync();
             return RedirectToAction("SignIn");
+        }
+
+        [HttpGet]
+
+        public IActionResult ForgetPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+
+        public async Task<IActionResult> SendResetPassword(ForgetPasswordDto model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByEmailAsync(model.Email);
+
+                if (user is not null)
+                {
+                    var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                    var url = Url.Action("ResetPassword", "Account", new { token = token, email = model.Email }, protocol: HttpContext.Request.Scheme);
+                    var email = new Helpers.Email()
+                    {
+                        To = model.Email,
+                        Subject = "Reset Password",
+                        Body = url
+                    };
+
+                    var flag = EmailSetting.SendEmail(email);
+
+                    if (flag)
+                    {
+
+                        return RedirectToAction("CheckYourInbox");
+                    }
+                }
+
+            }
+            return View("ForgetPassword", model);
+        }
+
+        [HttpGet]
+        public IActionResult CheckYourInbox()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult ResetPassword(string token, string email)
+        {
+            TempData["email"] = email;
+            TempData["token"] = token;
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword(ResetPasswordDto model)
+        {
+            if (ModelState.IsValid)
+            {
+                var email= TempData["email"] as string;
+                var token = TempData["token"] as string;
+                if (email == null || token == null) return BadRequest("Invalid Operation");
+                var user = await _userManager.FindByEmailAsync(email);
+                if (user is not null)
+                {
+                    var result = await _userManager.ResetPasswordAsync(user, token, model.NewPassword);
+                    if (result.Succeeded)
+                    {
+                        return RedirectToAction("SignIn");
+                    }
+                }
+                ModelState.AddModelError("", "Invalid Reset Password !!");
+            }
+            return View(model);
         }
     }
 }
