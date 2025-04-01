@@ -12,6 +12,8 @@ html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockq
     font-size: 100%;
     font: inherit;
     vertical-align: baseline;
+    background: url('/BackgroundImages/LogIn.jpg') no-repeat center center fixed;
+    background-size: cover;
 }
 
 article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
@@ -760,4 +762,6 @@ input.checkbox {
     .main-w3layouts {
         padding: 1em 0 0;
     }
+
+    .
 }
