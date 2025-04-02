@@ -75,6 +75,8 @@ namespace Presentation_Layer.Controllers
             }
             return View(employeeDto);
         }
+
+
         [HttpGet]
         public async Task<IActionResult> Details(int? id, string ViewName = "Details")
         {
