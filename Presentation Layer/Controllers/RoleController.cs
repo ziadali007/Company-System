@@ -1,6 +1,8 @@
 ﻿using Data_Access_Layer.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.General;
 using Presentation_Layer.Dtos;
 using Presentation_Layer.Helpers;
 
@@ -9,10 +11,12 @@ namespace Presentation_Layer.Controllers
     public class RoleController : Controller
     {
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly UserManager<AppUser> _userManager;
 
-        public RoleController(RoleManager<IdentityRole> roleManager)
+        public RoleController(RoleManager<IdentityRole> roleManager , UserManager<AppUser> userManager)
         {
             _roleManager = roleManager;
+            _userManager = userManager;
         }
         public IActionResult Index(string? Search)
         {
@@ -162,5 +166,67 @@ namespace Presentation_Layer.Controllers
             }
             return View(roleDto);
         }
+
+        [HttpGet]
+
+        public async Task<IActionResult> AddOrRemoveUsers(string roleId)
+        {
+            var role= await _roleManager.FindByIdAsync(roleId);
+            if (role is null) return NotFound(new { StatusCode = 404, Message = $"Role With Id {roleId} Is Not Found" });
+
+            ViewData["RoleId"] = roleId;
+            var userInRole = new List<UsersInRoleViewModel>();
+            var users =await _userManager.Users.ToListAsync();
+
+            foreach (var user in users)
+            {
+                var userInRoleViewModel = new UsersInRoleViewModel()
+                {
+                    UserId = user.Id,
+                    UserName = user.UserName,
+                };
+                if(await _userManager.IsInRoleAsync(user, role.Name))
+                {
+                    userInRoleViewModel.IsSelected = true;
+                }
+                else
+                {
+                    userInRoleViewModel.IsSelected = false;
+                }
+                userInRole.Add(userInRoleViewModel);
+            }
+
+            return View(userInRole);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddOrRemoveUsers(string roleId, List<UsersInRoleViewModel> users)
+        {
+            var role = await _roleManager.FindByIdAsync(roleId);
+            if (role is null) return NotFound(new { StatusCode = 404, Message = $"Role With Id {roleId} Is Not Found" });
+
+            if (ModelState.IsValid)
+            {
+                foreach (var user in users)
+                {
+                    var appUser= await _userManager.FindByIdAsync(user.UserId);
+                    if(appUser is not null)
+                    {
+                        if (user.IsSelected && ! await _userManager.IsInRoleAsync(appUser,role.Name))
+                        {
+                            await _userManager.AddToRoleAsync(appUser, role.Name);
+                        }
+                        else if (!user.IsSelected && await _userManager.IsInRoleAsync(appUser, role.Name))
+                        {
+                            await _userManager.RemoveFromRoleAsync(appUser, role.Name);
+                        }
+                    }
+                }
+
+                return RedirectToAction("Edit" , new {id= roleId });
+            }
+            return View(role);
+        }
+
     }
 }
